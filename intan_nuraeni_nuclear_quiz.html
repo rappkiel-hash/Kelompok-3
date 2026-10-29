@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intan Nuraeni's Nuclear Quiz</title>
+<style>
+:root{--bg:#0d1222;--panel:#171f35;--panel2:#222e4b;--text:#f5f7ff;--muted:#b5bfd7;--purple:#8265ff;--cyan:#4ce5ed;--green:#3ce0a2;--red:#ff7185}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;background:radial-gradient(circle at 10% 10%,#283b70,transparent 35%),radial-gradient(circle at 90% 85%,#164a59,transparent 35%),var(--bg);font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:var(--text)}
+.app{width:min(760px,100%);padding:clamp(22px,5vw,40px);border:1px solid #3a496c;border-radius:24px;background:#171f35f5;box-shadow:0 25px 80px #0007;position:relative;overflow:hidden}
+.sound{position:absolute;right:18px;top:18px;background:#2a3655;color:white;border:1px solid #53648c;border-radius:11px;padding:9px 12px;font-weight:800;cursor:pointer}
+.badge{display:inline-block;border:1px solid #495b8b;background:#263452;padding:7px 12px;border-radius:99px;font-size:.8rem;font-weight:800;letter-spacing:.04em}
+h1{font-size:clamp(2rem,7vw,3.35rem);line-height:1.04;letter-spacing:-.04em;margin:22px 0 12px}h1 span{color:var(--cyan)}p{color:var(--muted);line-height:1.65}
+.features{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 28px}.features span{padding:9px 12px;background:#222e49;border:1px solid #354568;border-radius:11px;font-size:.9rem}
+button{font:inherit;cursor:pointer;transition:transform .15s,filter .15s,box-shadow .15s}button:active{transform:scale(.97)}button:hover{filter:brightness(1.13)}
+.primary{width:100%;padding:15px;border:0;border-radius:13px;color:white;font-weight:900;background:linear-gradient(100deg,#795bff,#438dff);box-shadow:0 8px 25px #6b5cff55}
+.secondary{padding:13px 17px;border:1px solid #46577c;border-radius:12px;background:#283653;color:white;font-weight:800}
+.small{text-align:center;font-size:.82rem;color:#8999bd;margin-top:18px}
+.hidden{display:none!important}
+.topline{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:.9rem;margin:20px 0 15px}
+.timer{color:var(--cyan);font-weight:900}.timer.low{color:var(--red)}
+.track{height:8px;border-radius:20px;background:#2d3957;overflow:hidden;margin-bottom:25px}.fill{height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--cyan));transition:width .25s}
+.question{font-size:clamp(1.25rem,3.5vw,1.7rem);line-height:1.4;margin:0 0 22px}
+.answers{display:grid;gap:11px}.answer{display:flex;align-items:center;gap:12px;text-align:left;width:100%;padding:14px;background:#222e49;color:white;border:1px solid #3c4d71;border-radius:13px;animation:appear .25s ease both}
+.answer:nth-child(2){animation-delay:.04s}.answer:nth-child(3){animation-delay:.08s}.answer:nth-child(4){animation-delay:.12s}
+.letter{flex:0 0 31px;height:31px;display:grid;place-items:center;background:#374667;border-radius:9px;font-weight:900}
+.answer.correct{background:#124438;border-color:var(--green);box-shadow:0 0 18px #3ce0a233}.answer.wrong{background:#4b2736;border-color:var(--red);animation:shake .25s}
+.answer:disabled{cursor:default}
+.feedback{display:none;padding:14px;margin-top:15px;border-radius:12px;line-height:1.55}.feedback.show{display:block}.feedback.good{background:#124438;color:#c5ffeb}.feedback.bad{background:#4b2736;color:#ffe0e5}
+.row{margin-top:18px;display:flex}.row button{width:100%}
+.result{text-align:center}.score-circle{width:145px;height:145px;margin:25px auto;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle,#171f35 58%,transparent 60%),conic-gradient(var(--cyan) var(--progress),#35405d 0);font-size:2rem;font-weight:950}
+.review{text-align:left;margin:24px 0}.review details{background:#222e49;border:1px solid #3b4b6d;border-radius:12px;margin:9px 0;padding:12px}.review summary{font-weight:800;cursor:pointer;line-height:1.5}.review p{margin-bottom:0;font-size:.93rem}
+@keyframes appear{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}@keyframes glow{50%{box-shadow:0 0 28px #8265ff99}}@keyframes confetti{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+.primary{animation:glow 2.5s ease-in-out infinite}
+.confetti{position:fixed;top:-25px;z-index:10;pointer-events:none;animation:confetti 2.8s linear forwards}
+@media(max-width:480px){.sound{position:static;margin-bottom:15px}.app{padding:21px}.topline{font-size:.82rem}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<main class="app">
+<button class="sound" id="soundBtn">🔊 Suara ON</button>
+<section id="start">
+<div class="badge">⚛️ INTAN NURAENI'S NUCLEAR QUIZ</div>
+<h1>Quiz <span>Energi Nuklir</span></h1>
+<p>Website quiz sederhana untuk belajar materi presentasi energi nuklir. Jawab 10 pertanyaan tentang fisi dan fusi, bahan bakar nuklir, cara kerja PLTN, serta kelebihan dan kekurangannya.</p>
+<div class="features"><span>📝 10 soal</span><span>⏱️ 20 detik/soal</span><span>🔊 Efek suara</span><span>🏆 Skor otomatis</span></div>
+<button class="primary" id="startBtn">MULAI QUIZ →</button>
+<div class="small">Project pembelajaran • by Intan Nuraeni</div>
+</section>
+<section id="game" class="hidden">
+<div class="topline"><span id="progressText">Soal 1 dari 10</span><span>⭐ Skor: <b id="liveScore">0</b></span><span>⏱️ <b class="timer" id="timer">20</b>s</span></div>
+<div class="track"><div class="fill" id="progressFill"></div></div>
+<h2 class="question" id="question"></h2><div class="answers" id="answers"></div>
+<div class="feedback" id="feedback" aria-live="polite"></div><div class="row"><button class="secondary hidden" id="nextBtn">Soal berikutnya →</button></div>
+</section>
+<section id="result" class="result hidden">
+<div class="badge">🏁 QUIZ SELESAI</div><h1>Hasil <span>Akhir</span></h1>
+<div class="score-circle" id="scoreCircle"><span id="scorePercent">0%</span></div><h2 id="resultTitle">Bagus!</h2><p id="resultMessage"></p><p><b id="scoreText">Skor: 0 dari 100</b></p>
+<div class="review" id="review"><h3>📚 Pembahasan Jawaban</h3></div><button class="primary" id="restartBtn">🔄 COBA LAGI</button>
+<div class="small">Intan Nuraeni's Nuclear Quiz</div>
+</section>
+</main>
+<script>
+const quiz=[
+{q:"Apa yang dimaksud dengan energi nuklir?",a:["Energi yang berasal dari angin","Energi yang berasal dari inti atom","Energi yang berasal dari air laut","Energi yang hanya berasal dari Matahari"],c:1,w:"Energi nuklir berasal dari inti atom dan dapat dimanfaatkan untuk menghasilkan listrik."},
+{q:"Apa yang terjadi dalam reaksi fisi?",a:["Inti atom berat membelah","Dua inti atom ringan bergabung","Air berubah menjadi batu bara","Elektron menghilang seluruhnya"],c:0,w:"Fisi adalah pembelahan inti atom berat, misalnya uranium, yang menghasilkan energi."},
+{q:"Reaksi fusi secara alami terjadi di ...",a:["Batu bara","Baterai ponsel","Matahari","Turbin angin"],c:2,w:"Matahari menghasilkan energi melalui reaksi fusi, yaitu penggabungan inti atom ringan."},
+{q:"Bahan bakar yang banyak digunakan pada PLTN saat ini adalah ...",a:["Kayu","Uranium","Bensin","Angin"],c:1,w:"Uranium merupakan bahan bakar yang banyak digunakan pada pembangkit listrik tenaga nuklir."},
+{q:"Deuterium dan tritium merupakan isotop dari unsur ...",a:["Oksigen","Karbon","Hidrogen","Uranium"],c:2,w:"Deuterium dan tritium adalah isotop hidrogen yang diteliti untuk reaksi fusi."},
+{q:"Pada PLTN, panas dari reaksi fisi digunakan untuk ...",a:["Menghasilkan uap yang memutar turbin","Membuat panel surya bercahaya","Menggerakkan kincir angin","Mengubah listrik menjadi batu bara"],c:0,w:"Panas dari fisi digunakan untuk menghasilkan uap, lalu uap memutar turbin yang menggerakkan generator."},
+{q:"Komponen yang menghasilkan listrik ketika digerakkan oleh turbin adalah ...",a:["Radiator","Generator","Kondensor saja","Panel kaca"],c:1,w:"Turbin menggerakkan generator, dan generator menghasilkan energi listrik."},
+{q:"Manakah salah satu kelebihan energi nuklir?",a:["Tidak memerlukan pengawasan","Tidak menghasilkan limbah sama sekali","Dapat menghasilkan listrik besar dengan emisi karbon operasional rendah","Biaya pembangunannya selalu murah"],c:2,w:"Energi nuklir dapat menghasilkan listrik dalam jumlah besar dengan emisi karbon operasional yang rendah."},
+{q:"Salah satu kekurangan energi nuklir adalah ...",a:["Selalu bergantung pada sinar Matahari","Limbah radioaktif perlu dikelola dengan hati-hati","Tidak bisa menghasilkan listrik","Hanya bisa digunakan pada siang hari"],c:1,w:"Limbah radioaktif harus dikelola secara hati-hati, dan pembangunan PLTN juga membutuhkan biaya tinggi."},
+{q:"Kesimpulan yang tepat tentang sumber energi adalah ...",a:["Semua sumber energi tidak punya kekurangan","Energi nuklir selalu terbaik di semua keadaan","Pemilihan energi perlu mempertimbangkan biaya, keselamatan, lingkungan, dan kestabilan pasokan","Energi surya dan angin tidak bergantung pada alam"],c:2,w:"Setiap sumber energi memiliki kelebihan dan kekurangan. Pemilihannya perlu mempertimbangkan berbagai faktor."}
+];
+const $=id=>document.getElementById(id);let idx=0,score=0,left=20,tick=null,locked=false,answersGiven=[],soundOn=true,ctx=null;
+function audio(){try{ctx=ctx||new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==="suspended")ctx.resume();}catch(e){}}
+function tone(f=500,d=.14,type="sine",vol=.22,delay=0){if(!soundOn)return;try{audio();let o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime+delay;o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+d+.02)}catch(e){}}
+function clickSound(){tone(760,.09,"triangle",.25)}
+function correctSound(){tone(660,.18,"sine",.26);tone(880,.2,"sine",.25,.14);tone(1050,.22,"sine",.22,.29)}
+function wrongSound(){tone(260,.2,"triangle",.23);tone(185,.25,"triangle",.2,.16)}
+function winSound(){[523,659,784,1047,1318].forEach((f,i)=>tone(f,.3,"sine",.25,i*.13))}
+function show(which){["start","game","result"].forEach(s=>$(s).classList.toggle("hidden",s!==which))}
+function start(){audio();idx=0;score=0;answersGiven=[];$("liveScore").textContent="0";show("game");render()}
+function render(){locked=false;left=20;$("timer").textContent=left;$("timer").classList.remove("low");$("progressText").textContent=`Soal ${idx+1} dari ${quiz.length}`;$("progressFill").style.width=`${idx/quiz.length*100}%`;$("question").textContent=quiz[idx].q;$("answers").innerHTML="";$("feedback").className="feedback";$("nextBtn").classList.add("hidden");
+quiz[idx].a.forEach((a,i)=>{let b=document.createElement("button");b.className="answer";b.innerHTML=`<span class="letter">${"ABCD"[i]}</span><span>${a}</span>`;b.onclick=()=>choose(i);$("answers").appendChild(b)});
+clearInterval(tick);tick=setInterval(()=>{left--;$("timer").textContent=left;if(left<=5){$("timer").classList.add("low");tone(1050,.1,"square",.18)}if(left<=0){clearInterval(tick);choose(-1)}},1000)}
+function choose(c){if(locked)return;locked=true;clearInterval(tick);let q=quiz[idx];answersGiven.push(c);let ok=c===q.c;if(ok){score+=10;correctSound()}else{wrongSound()}$("liveScore").textContent=score;
+[...$("answers").children].forEach((b,i)=>{b.disabled=true;if(i===q.c)b.classList.add("correct");if(i===c&&c!==q.c)b.classList.add("wrong")});
+let fb=$("feedback");fb.className="feedback show "+(ok?"good":"bad");fb.textContent=(c===-1?"⏰ Waktu habis!":ok?"✅ Benar!":"❌ Belum tepat.")+" "+q.w;$("progressFill").style.width=`${(idx+1)/quiz.length*100}%`;$("nextBtn").textContent=idx===quiz.length-1?"Lihat hasil 🏆":"Soal berikutnya →";$("nextBtn").classList.remove("hidden")}
+function next(){if(!locked)return;if(idx<quiz.length-1){idx++;render()}else finish()}
+function confetti(){for(let i=0;i<32;i++){let e=document.createElement("span");e.className="confetti";e.textContent=["✨","🎉","⭐","⚛️"][Math.floor(Math.random()*4)];e.style.left=Math.random()*100+"vw";e.style.animationDelay=Math.random()*.5+"s";e.style.fontSize=(14+Math.random()*16)+"px";document.body.append(e);setTimeout(()=>e.remove(),3500)}}
+function finish(){clearInterval(tick);show("result");winSound();if(score>=70)confetti();$("scorePercent").textContent=score+"%";$("scoreCircle").style.setProperty("--progress",score*3.6+"deg");$("scoreText").textContent=`Skor: ${score} dari 100`;
+let title,msg;if(score===100){title="Sempurna! 🌟";msg="Keren! Kamu memahami materi energi nuklir dengan sangat baik."}else if(score>=70){title="Hebat! 🎉";msg="Pemahamanmu sudah bagus. Baca pembahasan untuk memperkuat materi."}else if(score>=40){title="Terus belajar! 💪";msg="Kamu sudah mulai memahami materi. Pelajari lagi pembahasannya."}else{title="Jangan menyerah! 🚀";msg="Baca kembali materi presentasi lalu coba quiz sekali lagi."}$("resultTitle").textContent=title;$("resultMessage").textContent=msg;
+let r=$("review");r.innerHTML="<h3>📚 Pembahasan Jawaban</h3>";quiz.forEach((q,i)=>{let d=document.createElement("details"),s=document.createElement("summary"),p=document.createElement("p");s.textContent=`${i+1}. ${q.q} — ${answersGiven[i]===q.c?"Benar ✅":"Jawaban benar: "+"ABCD"[q.c]}`;p.textContent=q.w;d.append(s,p);r.append(d)})}
+$("startBtn").onclick=()=>{clickSound();start()};$("nextBtn").onclick=()=>{clickSound();next()};$("restartBtn").onclick=()=>{clickSound();start()};$("soundBtn").onclick=()=>{soundOn=!soundOn;$("soundBtn").textContent=soundOn?"🔊 Suara ON":"🔇 Suara OFF";if(soundOn){audio();tone(700,.14,"sine",.25);tone(950,.16,"sine",.24,.14)}};
+document.addEventListener("pointerdown",()=>audio(),{once:true});
+</script>
+</body>
+</html>
